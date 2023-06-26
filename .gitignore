@@ -1,3 +1,6 @@
+# not send fake database files
+data/*
+
 # Logs
 logs
 *.log
