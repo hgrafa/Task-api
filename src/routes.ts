@@ -1,22 +1,16 @@
-import { ServerResponse } from 'http'
-import { Request } from './utils/request'
 import { NewTask } from './domain/DTOs/taks-dtos'
 import { randomUUID } from 'crypto'
 import { Task } from './domain/model/task'
 import { TaskDatabase } from './repository'
-
-interface Route {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  path: string
-  handler: (req: Request, res: ServerResponse) => ServerResponse
-}
+import { Path } from './utils/path'
+import { Route } from './utils/route'
 
 const taskDatabase = new TaskDatabase()
 
 export const routes: Route[] = [
   {
     method: 'GET',
-    path: '/tasks',
+    path: Path.of('tasks'),
     handler: (req, res) => {
       const tasks = taskDatabase.select()
 
@@ -27,7 +21,7 @@ export const routes: Route[] = [
   },
   {
     method: 'POST',
-    path: '/tasks',
+    path: Path.of('tasks'),
     handler: (req, res) => {
       const { title, description }: NewTask = req.body
 
