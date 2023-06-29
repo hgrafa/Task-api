@@ -1,13 +1,17 @@
-import { Param } from '../utils/param'
+import { Params } from '../utils/params'
 
-export function extractQueryParams(query: string) {
-  return query
+export function extractQueryParams(query: string): Params {
+  const queryParams: Params = new Params()
+
+  if (!query.includes('?')) return queryParams
+
+  query
     .slice(1)
     .split('&')
-    .reduce((queryParams, querySlice) => {
-      const [key, value] = querySlice.split('=')
-      const param: Param = Param.of(key, value)
-      queryParams.push(param)
-      return queryParams
-    }, [] as Param[])
+    .forEach((queryParam) => {
+      const [key, value] = queryParam.split('=')
+      queryParams.add(key, value)
+    })
+
+  return queryParams
 }
