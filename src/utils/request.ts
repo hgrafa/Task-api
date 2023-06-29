@@ -1,8 +1,8 @@
 import { IncomingMessage } from 'node:http'
-import { Param } from './param'
+import { Params } from './params'
 
 export interface Request extends IncomingMessage {
   body?: any
-  params?: Param[]
-  queryParams?: Param[]
+  params?: Params
+  queryParams?: Params
 }
