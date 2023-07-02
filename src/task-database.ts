@@ -22,6 +22,11 @@ export class TaskDatabase {
     fs.writeFile(databasePath, JSON.stringify(this.tasks))
   }
 
+  public selectById(id: string) {
+    const data = this.tasks ?? []
+    return data.find((entity) => entity.id === id)
+  }
+
   public select(where?: (task: Task) => boolean) {
     const data = this.tasks ?? []
 
@@ -43,12 +48,16 @@ export class TaskDatabase {
     return data
   }
 
-  public update(id: string, data: Partial<Task>) {
-    // const rowIndex: number = this.tasks.findIndex((task) => task.id === id)
-    // if (rowIndex > -1) {
-    //   this.tasks[rowIndex] =
-    //   this.persist()
-    // }
+  public update(id: string, data: Partial<Task>): boolean {
+    const rowIndex: number = this.tasks.findIndex((task) => task.id === id)
+    if (rowIndex > -1) {
+      const task = this.tasks[rowIndex]
+      this.tasks[rowIndex] = { ...task, ...data }
+      this.persist()
+      return true
+    }
+
+    return false
   }
 
   public delete(id: string): boolean {
