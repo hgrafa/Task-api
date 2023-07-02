@@ -1,5 +1,5 @@
 # not send fake database files
-data/*
+data/**
 
 # Logs
 logs
