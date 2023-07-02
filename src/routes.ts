@@ -20,6 +20,24 @@ export const routes: Route[] = [
     },
   },
   {
+    method: 'GET',
+    path: Path.of('tasks', ':id'),
+    handler: (req, res) => {
+      if (!req.params?.has('id')) res.writeHead(406).end()
+
+      const id = req.params?.get('id')
+      if (!id) res.writeHead(406).end()
+
+      const task = taskDatabase.selectById(id!)
+
+      return !task
+        ? res.writeHead(404).end()
+        : res
+            .setHeader('Content-Type', 'application/json')
+            .end(JSON.stringify(task))
+    },
+  },
+  {
     method: 'POST',
     path: Path.of('tasks'),
     handler: (req, res) => {
@@ -41,10 +59,20 @@ export const routes: Route[] = [
     method: 'PUT',
     path: Path.of('tasks', ':id'),
     handler: (req, res) => {
-      // const { title, description }: TaskUpdate = req.body
-      // const taskUpdate: TaskUpdate = { title, description }
-      // taskDatabase.update(taskUpdate)
-      return res.writeHead(201).end()
+      if (!req.params?.has('id')) res.writeHead(406).end()
+
+      const id = req.params?.get('id')
+      if (!id) res.writeHead(406).end()
+
+      const { title, description }: Partial<Task> = req.body
+      const partialTask = { title, description }
+      const partialTaskOnlyDefined = Object.fromEntries(
+        Object.entries(partialTask).filter(([_, value]) => value !== undefined),
+      )
+
+      const isUpdated = taskDatabase.update(id!, partialTaskOnlyDefined)
+
+      return res.writeHead(isUpdated ? 202 : 404).end()
     },
   },
   {
