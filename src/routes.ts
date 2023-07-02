@@ -1,4 +1,4 @@
-import { NewTask, TaskUpdate } from './domain/DTOs/taks-dtos'
+import { NewTask } from './domain/DTOs/taks-dtos'
 import { randomUUID } from 'crypto'
 import { Task } from './domain/model/task'
 import { TaskDatabase } from './task-database'
@@ -41,8 +41,8 @@ export const routes: Route[] = [
     method: 'PUT',
     path: Path.of('tasks', ':id'),
     handler: (req, res) => {
-      const { title, description }: TaskUpdate = req.body
-      const taskUpdate: TaskUpdate = { title, description }
+      // const { title, description }: TaskUpdate = req.body
+      // const taskUpdate: TaskUpdate = { title, description }
       // taskDatabase.update(taskUpdate)
       return res.writeHead(201).end()
     },
@@ -51,42 +51,33 @@ export const routes: Route[] = [
     method: 'PATCH',
     path: Path.of('tasks', ':id', 'complete'),
     handler: (req, res) => {
-      if(!req.params?.has('id')) 
-        res.writeHead(406).end()
-        
+      if (!req.params?.has('id')) res.writeHead(406).end()
+
       const id = req.params?.get('id')
-        
-      if(!id)
-        res.writeHead(406).end()
+      if (!id) res.writeHead(406).end()
 
-      let tasksFounded = taskDatabase.select((task) => {
-        return task.id === id
-      })
+      const task = taskDatabase.selectById(id!)
+      const isAlreadyCompleted = task ? !!task.completed_at : false
 
-        const task: Task = tasksFounded[0] ?? ({} as Task)
-        return res
-          .writeHead(task ? )
-          // TODO finish return restful status and content complemted
+      if (isAlreadyCompleted) return res.writeHead(405).end()
 
-      // taskDatabase.update(taskUpdate)
-      return res.writeHead(201).end()
+      const taskCompleteUpdate: Partial<Task> = { completed_at: new Date() }
+      const isUpdated = taskDatabase.update(id!, taskCompleteUpdate)
+
+      return res.writeHead(isUpdated ? 202 : 404).end()
     },
   },
   {
     method: 'DELETE',
     path: Path.of('tasks', ':id'),
     handler: (req, res) => {
-      const idParam = req.params?.find(({ key }) => {
-        return key === 'id'
-      })
+      if (!req.params?.has('id')) res.writeHead(406).end()
 
-      let deleted = false
+      const id = req.params!.get('id')
+      if (!id) res.writeHead(406).end()
 
-      if (idParam) {
-        deleted = taskDatabase.delete(idParam.value)
-      }
-
-      return res.writeHead(deleted ? 204 : 406).end()
+      const isDeleted = taskDatabase.delete(id!)
+      return res.writeHead(isDeleted ? 204 : 406).end()
     },
   },
 ]
