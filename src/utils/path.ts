@@ -20,6 +20,8 @@ export class Path {
   }
 
   static of(...values: string[]): Path {
+    if (values.length === 1) return new Path(values[0])
+
     const url = values.reduce((acc, value) => {
       return acc.concat(`/${value}`)
     }, '')
